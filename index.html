@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт із кнопками та анімаціями</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .button {
+            position: relative;
+            padding: 1rem 2rem;
+            font-size: 1.25rem;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 0.75rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            margin: 1rem;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-button {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-button.yes { background: #23a6d5; }
+        .modal-button.no { background: #e73c7e; }
+        .modal-button.yes:hover { background: #1b8bb4; }
+        .modal-button.no:hover { background: #c4346b; }
+
+        .video-option {
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 0.5rem;
+            background: #23a6d5;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-option:hover {
+            background: #1b8bb4;
+        }
+
+        .password-input {
+            padding: 0.5rem;
+            margin: 1rem 0;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            width: 80%;
+            font-size: 1rem;
+        }
+
+        .error-message {
+            color: #e73c7e;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .video-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .video-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 0.5rem;
+        }
+
+        .close-video {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e73c7e;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .close-video:hover {
+            background: #c4346b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Вибери танець</h1>
+        <div class="button" data-redirect="list.html" data-requires-password="true">ПИСЬМО ДЛЯ СИЛЬВІЇ</div>
+        <div class="button" data-videos='[
+            {"title": "НЕ ЗАХОДЬ 1", "url": "781edb58-23d6-4114-a73f-566f780c2ea4.mp4"},
+            {"title": "НЕ ЗАХОДЬ 2", "url": "b07171a1-4c5d-4fcf-be13-5a51eec460bf.mp4"},
+            {"title": "НЕ ЗАХОДЬ 3", "url": "bc1dd4bc-e8b7-438e-9596-0dcc2b0656f1.mp4"}
+        ]'>НЕ ЗАХОДИТИ</div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <p class="text-lg font-semibold mb-4">Я Ж КАЖУ НЕ ЗАХОДИТИ</p>
+            <button class="modal-button yes" onclick="openVideoSelection()">ПОКАЖИ УЖЕ</button>
+            <button class="modal-button no" onclick="closeModal()">Ну ладно...</button>
+        </div>
+    </div>
+
+    <div class="modal" id="video-selection-modal">
+        <div class="modal-content">
+            <p class="text-lg font-semibold mb-4">Виберіть відео</p>
+            <div id="video-options"></div>
+            <button class="modal-button no" onclick="closeVideoSelection()">Скасувати</button>
+        </div>
+    </div>
+
+    <div class="modal" id="password-modal">
+        <div class="modal-content">
+            <p class="text-lg font-semibold mb-4">Введіть пароль</p>
+            <input type="password" class="password-input" id="password-input" placeholder="Пароль">
+            <p class="error-message" id="error-message">Неправильний пароль!</p>
+            <button class="modal-button yes" onclick="checkPassword()">Підтвердити</button>
+            <button class="modal-button no" onclick="closePasswordModal()">Скасувати</button>
+        </div>
+    </div>
+
+    <div class="video-container" id="video-container">
+        <div class="video-content">
+            <video id="modal-video" controls loop></video>
+            <button class="close-video" onclick="closeVideo()">Закрити</button>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('modal');
+        const videoSelectionModal = document.getElementById('video-selection-modal');
+        const passwordModal = document.getElementById('password-modal');
+        const videoContainer = document.getElementById('video-container');
+        const videoElement = document.getElementById('modal-video');
+        const passwordInput = document.getElementById('password-input');
+        const errorMessage = document.getElementById('error-message');
+        const videoOptionsContainer = document.getElementById('video-options');
+        let currentVideoUrl = '';
+        let redirectUrl = '';
+        let requiresPassword = false;
+        let videoList = [];
+        const correctPassword = 'sylviaontop';
+
+        document.querySelectorAll('.button').forEach(button => {
+            button.addEventListener('click', () => {
+                currentVideoUrl = button.getAttribute('data-video') || '';
+                redirectUrl = button.getAttribute('data-redirect') || '';
+                requiresPassword = button.getAttribute('data-requires-password') === 'true';
+                videoList = button.getAttribute('data-videos') ? JSON.parse(button.getAttribute('data-videos')) : [];
+                if (requiresPassword) {
+                    passwordModal.style.display = 'flex';
+                    passwordInput.focus();
+                } else {
+                    modal.style.display = 'flex';
+                }
+            });
+        });
+
+        function checkPassword() {
+            if (passwordInput.value === correctPassword) {
+                passwordModal.style.display = 'none';
+                errorMessage.style.display = 'none';
+                passwordInput.value = '';
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                }
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function openVideoSelection() {
+            modal.style.display = 'none';
+            videoOptionsContainer.innerHTML = '';
+            videoList.forEach(video => {
+                const option = document.createElement('div');
+                option.className = 'video-option';
+                option.textContent = video.title;
+                option.addEventListener('click', () => {
+                    currentVideoUrl = video.url;
+                    showVideo();
+                });
+                videoOptionsContainer.appendChild(option);
+            });
+            videoSelectionModal.style.display = 'flex';
+        }
+
+        function showVideo() {
+            modal.style.display = 'none';
+            videoSelectionModal.style.display = 'none';
+            passwordModal.style.display = 'none';
+            videoElement.src = currentVideoUrl;
+            videoContainer.style.display = 'flex';
+            videoElement.play();
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        function closeVideoSelection() {
+            videoSelectionModal.style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            passwordModal.style.display = 'none';
+            errorMessage.style.display = 'none';
+            passwordInput.value = '';
+        }
+
+        function closeVideo() {
+            videoContainer.style.display = 'none';
+            videoElement.pause();
+            videoElement.src = '';
+        }
+
+        videoContainer.addEventListener('click', (e) => {
+            if (e.target === videoContainer) {
+                closeVideo();
+            }
+        });
+    </script>
+</body>
+</html>
